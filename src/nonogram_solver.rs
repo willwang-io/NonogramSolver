@@ -7,6 +7,12 @@ pub struct SolvedPuzzle {
     pub grid: Vec<Vec<u64>>,
 }
 
+#[derive(Debug, Clone, PartialEq)]
+pub struct SolveSteps {
+    pub color_panel: Vec<String>,
+    pub steps: Vec<Vec<Vec<u64>>>,
+}
+
 #[derive(Debug)]
 pub enum SolveError {
     TooManyColors(usize),
@@ -27,6 +33,19 @@ impl std::fmt::Display for SolveError {
 impl std::error::Error for SolveError {}
 
 pub fn solve_puzzle(data: PuzzleData) -> Result<SolvedPuzzle, SolveError> {
+    let steps = solve_puzzle_steps(data)?;
+    let grid = steps
+        .steps
+        .last()
+        .cloned()
+        .ok_or(SolveError::Unsolvable)?;
+    Ok(SolvedPuzzle {
+        color_panel: steps.color_panel,
+        grid,
+    })
+}
+
+pub fn solve_puzzle_steps(data: PuzzleData) -> Result<SolveSteps, SolveError> {
     let color_count = data.color_panel.len();
     if color_count == 0 || color_count > 63 {
         return Err(SolveError::TooManyColors(color_count));
@@ -46,6 +65,9 @@ pub fn solve_puzzle(data: PuzzleData) -> Result<SolvedPuzzle, SolveError> {
     let mut dead_cols = vec![false; n];
     let mut solver = OneLineSolver::new(m.max(n));
 
+    let mut steps = Vec::new();
+    steps.push(row_masks.clone());
+
     let mut prev_sum = u64::MAX;
     loop {
         if !update_groups_state(&mut solver, &mut dead_rows, &row_groups, &mut row_masks) {
@@ -60,11 +82,12 @@ pub fn solve_puzzle(data: PuzzleData) -> Result<SolvedPuzzle, SolveError> {
             break;
         }
         prev_sum = cur_sum;
+        steps.push(row_masks.clone());
     }
 
-    Ok(SolvedPuzzle {
+    Ok(SolveSteps {
         color_panel: data.color_panel,
-        grid: row_masks,
+        steps,
     })
 }
 

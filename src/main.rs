@@ -1,6 +1,6 @@
 use dioxus::prelude::*;
 
-use nonogram_solver::nonogram_solver::{mask_to_color_index, solve_puzzle, SolvedPuzzle};
+use nonogram_solver::nonogram_solver::{mask_to_color_index, solve_puzzle_steps, SolveSteps};
 use nonogram_solver::puzzle_crawler::{fetch_color_puzzle, PuzzleData};
 
 const STYLE_CSS: Asset = asset!("/assets/style.css");
@@ -24,7 +24,7 @@ fn App() -> Element {
             let data = fetch_puzzle(puzzle_id)
                 .await
                 .map_err(|err| err.to_string())?;
-            solve_puzzle(data)
+            solve_puzzle_steps(data)
                 .map(Some)
                 .map_err(|err| err.to_string())
         }
@@ -49,7 +49,7 @@ fn App() -> Element {
                     None => rsx! { div { class: "status", "Loading puzzle..." } },
                     Some(Err(err)) => rsx! { div { class: "status", "Failed to load puzzle: {err}" } },
                     Some(Ok(None)) => rsx! { div { class: "status", "Enter a nonograms.org URL or ID" } },
-                    Some(Ok(Some(solution))) => rsx! { div { class: "grid-wrap", PuzzleGrid { solution } } },
+                    Some(Ok(Some(steps))) => rsx! { div { class: "grid-wrap", PuzzleViewer { steps } } },
                 }}
             }
         }
@@ -64,8 +64,46 @@ async fn fetch_puzzle(puzzle_id: String) -> Result<PuzzleData, ServerFnError> {
 }
 
 #[component]
-fn PuzzleGrid(solution: SolvedPuzzle) -> Element {
-    let SolvedPuzzle { color_panel, grid } = solution;
+fn PuzzleViewer(steps: SolveSteps) -> Element {
+    let total_steps = steps.steps.len();
+    let mut current_step = use_signal(|| 0usize);
+    let mut last_len = use_signal(|| 0usize);
+    let steps_len = steps.steps.len();
+    use_effect(move || {
+        if last_len() != steps_len {
+            *current_step.write() = 0;
+            *last_len.write() = steps_len;
+        }
+    });
+
+    let step_idx = current_step().min(steps_len.saturating_sub(1));
+    let grid = steps.steps.get(step_idx).cloned().unwrap_or_default();
+    let color_panel = steps.color_panel.clone();
+    let is_initial = step_idx == 0;
+    let max_step = total_steps.saturating_sub(1);
+
+    rsx! {
+        PuzzleGrid { color_panel, grid, is_initial }
+        div { class: "step-controls",
+            input {
+                class: "step-slider",
+                r#type: "range",
+                min: "0",
+                max: "{max_step}",
+                value: "{step_idx}",
+                oninput: move |e| {
+                    if let Ok(value) = e.value().parse::<usize>() {
+                        *current_step.write() = value.min(max_step);
+                    }
+                }
+            }
+            div { class: "step-label", "{step_idx} / {max_step}" }
+        }
+    }
+}
+
+#[component]
+fn PuzzleGrid(color_panel: Vec<String>, grid: Vec<Vec<u64>>, is_initial: bool) -> Element {
     let rows = grid.len();
     let cols = grid.first().map(|row| row.len()).unwrap_or(0);
     let cell_size = cell_size_for_grid(rows, cols);
@@ -77,10 +115,14 @@ fn PuzzleGrid(solution: SolvedPuzzle) -> Element {
         .iter()
         .flat_map(|row| row.iter())
         .map(|mask| {
-            let color = mask_to_color_index(*mask)
-                .and_then(|idx| color_panel.get(idx))
-                .map(|c| c.as_str())
-                .unwrap_or("#cccccc");
+            let color = if is_initial {
+                "#ffffff"
+            } else {
+                mask_to_color_index(*mask)
+                    .and_then(|idx| color_panel.get(idx))
+                    .map(|c| c.as_str())
+                    .unwrap_or("#ffffff")
+            };
             format!(
                 "width: {}px; height: {}px; background-color: {};",
                 cell_size, cell_size, color
@@ -107,8 +149,8 @@ fn PuzzleGrid(solution: SolvedPuzzle) -> Element {
                 for (style, color) in swatches {
                     div { class: "swatch-color", style: style, title: color.clone(), "data-color": "{color}" }
                 }
+                }
             }
-        }
         }
         div { class: "grid", style: grid_style,
             for cell_style in cells {
