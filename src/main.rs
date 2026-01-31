@@ -88,7 +88,28 @@ fn PuzzleGrid(solution: SolvedPuzzle) -> Element {
         })
         .collect();
 
+    let swatches: Vec<(String, String)> = color_panel
+        .iter()
+        .map(|color| {
+            (
+                format!("background-color: {};", color),
+                color.to_string(),
+            )
+        })
+        .collect();
+
     rsx! {
+        div { class: "puzzle-meta",
+            div { class: "puzzle-meta-line",
+                span { class: "puzzle-size", "{cols} × {rows}" }
+                span { class: "palette-label", "colors" }
+                div { class: "palette-inline",
+                for (style, color) in swatches {
+                    div { class: "swatch-color", style: style, title: color.clone(), "data-color": "{color}" }
+                }
+            }
+        }
+        }
         div { class: "grid", style: grid_style,
             for cell_style in cells {
                 div { class: "cell", style: cell_style }
@@ -106,7 +127,9 @@ fn cell_size_for_grid(rows: usize, cols: usize) -> usize {
         21..=30 => 20,
         31..=40 => 16,
         41..=60 => 14,
-        _ => 12,
+        61..=80 => 12,
+        81..=100 => 10,
+        _ => 8,
     }
 }
 

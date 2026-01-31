@@ -62,13 +62,77 @@ body {
   margin-top: 16px;
   overflow-x: auto;
   display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.puzzle-meta {
+  display: flex;
+  align-items: center;
   justify-content: center;
+}
+
+.puzzle-meta-line {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: #4a4a45;
+  background: #f7f7f4;
+  border: 1px solid #e0e0db;
+  border-radius: 999px;
+  padding: 6px 12px;
+  overflow: visible;
+}
+
+.puzzle-size {
+  font-weight: 600;
+}
+
+.palette-label {
+  color: #7a7a74;
+  font-size: 12px;
+  text-transform: lowercase;
+  letter-spacing: 0.03em;
+}
+
+.palette-inline {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  overflow: visible;
+}
+
+.swatch-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 0.5px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+.swatch-color:hover::after {
+  content: attr(data-color);
+  position: absolute;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1f1f1f;
+  color: #ffffff;
+  font-size: 11px;
+  padding: 3px 6px;
+  border-radius: 6px;
+  white-space: nowrap;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  pointer-events: none;
+  z-index: 2;
 }
 
 .grid {
   background: #f0f0ed;
   padding: 6px;
   border-radius: 10px;
+  margin-top: 12px;
 }
 
 .cell {
