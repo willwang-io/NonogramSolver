@@ -4,7 +4,14 @@
 
 use serde::{Deserialize, Serialize};
 
-const BASE_URL: &str = "https://www.nonograms.org/nonograms2/i/";
+const COLOR_URL: &str = "https://www.nonograms.org/nonograms2/i/";
+const BW_URL: &str = "https://www.nonograms.org/nonograms/i/";
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PuzzleKind {
+    Color,
+    BlackWhite,
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Group {
@@ -49,18 +56,29 @@ impl std::error::Error for CrawlError {}
 /// # }
 /// ```
 pub async fn fetch_color_puzzle(puzzle_id: &str) -> Result<PuzzleData, CrawlError> {
-    let html = fetch_html(puzzle_id).await?;
-    parse_color_puzzle(&html)
+    fetch_puzzle(PuzzleKind::Color, puzzle_id).await
 }
 
-/// Parse a color puzzle from a page's HTML.
-pub fn parse_color_puzzle(html: &str) -> Result<PuzzleData, CrawlError> {
+pub async fn fetch_puzzle(
+    kind: PuzzleKind,
+    puzzle_id: &str,
+) -> Result<PuzzleData, CrawlError> {
+    let html = fetch_html(kind, puzzle_id).await?;
+    parse_puzzle(kind, &html)
+}
+
+/// Parse a puzzle from a page's HTML.
+pub fn parse_puzzle(kind: PuzzleKind, html: &str) -> Result<PuzzleData, CrawlError> {
     let data = extract_d_array(html)?;
-    decode_puzzle_data(&data)
+    decode_puzzle_data(kind, &data)
 }
 
-async fn fetch_html(puzzle_id: &str) -> Result<String, CrawlError> {
-    let url = format!("{BASE_URL}{puzzle_id}");
+async fn fetch_html(kind: PuzzleKind, puzzle_id: &str) -> Result<String, CrawlError> {
+    let base = match kind {
+        PuzzleKind::Color => COLOR_URL,
+        PuzzleKind::BlackWhite => BW_URL,
+    };
+    let url = format!("{base}{puzzle_id}");
     let response = reqwest::get(url)
         .await
         .map_err(|e| CrawlError::Network(e.to_string()))?;
@@ -118,7 +136,7 @@ fn extract_d_array(html: &str) -> Result<Vec<[i64; 4]>, CrawlError> {
     Ok(out)
 }
 
-fn decode_puzzle_data(data: &[[i64; 4]]) -> Result<PuzzleData, CrawlError> {
+fn decode_puzzle_data(kind: PuzzleKind, data: &[[i64; 4]]) -> Result<PuzzleData, CrawlError> {
     if data.len() < 6 {
         return Err(CrawlError::InvalidData("d array too short"));
     }
@@ -151,13 +169,21 @@ fn decode_puzzle_data(data: &[[i64; 4]]) -> Result<PuzzleData, CrawlError> {
 
     let base = d[4];
     let mut color_panel = Vec::with_capacity(colors + 1);
-    color_panel.push("#ffffff".to_string());
-    for i in 0..colors {
-        let entry = d[5 + i];
-        let r = ((entry[0] - base[1]) % 256 + 256) % 256;
-        let g = ((entry[1] - base[0]) % 256 + 256) % 256;
-        let b = ((entry[2] - base[3]) % 256 + 256) % 256;
-        color_panel.push(format!("#{:02x}{:02x}{:02x}", r, g, b));
+    match kind {
+        PuzzleKind::BlackWhite => {
+            color_panel.push("#ffffff".to_string());
+            color_panel.push("#000000".to_string());
+        }
+        PuzzleKind::Color => {
+            color_panel.push("#ffffff".to_string());
+            for i in 0..colors {
+                let entry = d[5 + i];
+                let r = ((entry[0] - base[1]) % 256 + 256) % 256;
+                let g = ((entry[1] - base[0]) % 256 + 256) % 256;
+                let b = ((entry[2] - base[3]) % 256 + 256) % 256;
+                color_panel.push(format!("#{:02x}{:02x}{:02x}", r, g, b));
+            }
+        }
     }
 
     let v_idx = colors + 5;
