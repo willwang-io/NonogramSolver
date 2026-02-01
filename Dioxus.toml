@@ -1,9 +1,11 @@
 [application]
+out_dir = "dist"
 
 [web.app]
 
 # HTML title tag content
 title = "Nonogram Solver"
+base_path = "/"
 
 # include `assets` in web platform
 [web.resource]
