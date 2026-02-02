@@ -8,8 +8,6 @@ use nonogram_solver::puzzle_crawler::{
     PuzzleData, PuzzleKind, fetch_puzzle as fetch_remote_puzzle,
 };
 
-const STYLE_CSS: Asset = asset!("/assets/style.css");
-
 fn main() {
     dioxus::launch(App);
 }
@@ -36,14 +34,19 @@ fn App() -> Element {
     });
 
     rsx! {
-        document::Stylesheet { href: STYLE_CSS }
+        // document::Meta { content: "text/html;charset=utf-8" }
+        document::Stylesheet { href: asset!("/assets/style.css") }
         document::Link { rel: "icon", href: asset!("/assets/favicon.ico") }
+        document::Title { "Nonogram Solver" }
+        document::Meta { name: "author", content: "Jiaye Will Wang" }
         document::Meta {
             name: "description",
             content: "Solve color and black-and-white nonograms online with step-by-step visualization.",
         }
-        document::Meta { name: "author", content: "Jiaye Will Wang" }
-        div { class: "page",
+        document::Meta { name: "viewport", content: "width=device-width, initial-scale=1" }
+        document::Meta { content: "viewtext/html;charset=utf-8port", http_equiv: "Content-Type" }
+
+        main { class: "page",
             div { class: "card",
                 h1 { class: "title", "Nonogram Solver" }
                 div { class: "input-row",

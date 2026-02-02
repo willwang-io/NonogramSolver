@@ -25,7 +25,9 @@ pub fn PuzzleViewer(steps: SolveSteps) -> Element {
     rsx! {
         PuzzleGrid { color_panel, grid, is_initial }
         div { class: "step-controls",
+            label { class: "sr-only", r#for: "step-slider", "Solve step slider" }
             input {
+                id: "step-slider",
                 class: "step-slider",
                 r#type: "range",
                 min: "0",

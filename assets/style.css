@@ -77,9 +77,9 @@ body {
   align-items: center;
   gap: 10px;
   font-size: 13px;
-  color: #4a4a45;
-  background: #f7f7f4;
-  border: 1px solid #e0e0db;
+  color: #2f2f2a;
+  background: #f3f3ef;
+  border: 1px solid #d6d6d0;
   border-radius: 999px;
   padding: 6px 12px;
   overflow: visible;
@@ -90,7 +90,7 @@ body {
 }
 
 .palette-label {
-  color: #7a7a74;
+  color: #3f3f3a;
   font-size: 12px;
   text-transform: lowercase;
   letter-spacing: 0.03em;
@@ -188,4 +188,16 @@ body {
 
 .cell {
   box-shadow: inset 0 0 0 0.5px rgba(0, 0, 0, 0.12);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
