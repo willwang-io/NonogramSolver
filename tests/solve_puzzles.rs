@@ -1,5 +1,5 @@
 use nonogram_solver::nonogram_solver::{mask_to_color_index, solve_puzzle};
-use nonogram_solver::puzzle_crawler::{fetch_puzzle, Group, PuzzleKind};
+use nonogram_solver::puzzle_crawler::{Group, PuzzleKind, fetch_puzzle};
 
 fn groups_from_grid(grid: &[Vec<u64>]) -> (Vec<Vec<Group>>, Vec<Vec<Group>>) {
     let rows = grid.len();
@@ -16,7 +16,10 @@ fn groups_from_grid(grid: &[Vec<u64>]) -> (Vec<Vec<Group>>, Vec<Vec<Group>>) {
             }
             let len = col - start;
             if color > 0 && len > 0 {
-                groups.push(Group { len, color_id: color });
+                groups.push(Group {
+                    len,
+                    color_id: color,
+                });
             }
         }
         row_groups.push(groups);
@@ -34,7 +37,10 @@ fn groups_from_grid(grid: &[Vec<u64>]) -> (Vec<Vec<Group>>, Vec<Vec<Group>>) {
             }
             let len = row - start;
             if color > 0 && len > 0 {
-                groups.push(Group { len, color_id: color });
+                groups.push(Group {
+                    len,
+                    color_id: color,
+                });
             }
         }
         col_groups.push(groups);

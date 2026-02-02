@@ -59,10 +59,7 @@ pub async fn fetch_color_puzzle(puzzle_id: &str) -> Result<PuzzleData, CrawlErro
     fetch_puzzle(PuzzleKind::Color, puzzle_id).await
 }
 
-pub async fn fetch_puzzle(
-    kind: PuzzleKind,
-    puzzle_id: &str,
-) -> Result<PuzzleData, CrawlError> {
+pub async fn fetch_puzzle(kind: PuzzleKind, puzzle_id: &str) -> Result<PuzzleData, CrawlError> {
     let html = fetch_html(kind, puzzle_id).await?;
     parse_puzzle(kind, &html)
 }

@@ -32,12 +32,7 @@ pub fn PuzzleGrid(color_panel: Vec<String>, grid: Vec<Vec<u64>>, is_initial: boo
 
     let swatches: Vec<(String, String)> = color_panel
         .iter()
-        .map(|color| {
-            (
-                format!("background-color: {};", color),
-                color.to_string(),
-            )
-        })
+        .map(|color| (format!("background-color: {};", color), color.to_string()))
         .collect();
 
     rsx! {

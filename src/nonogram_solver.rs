@@ -34,11 +34,7 @@ impl std::error::Error for SolveError {}
 
 pub fn solve_puzzle(data: PuzzleData) -> Result<SolvedPuzzle, SolveError> {
     let steps = solve_puzzle_steps(data)?;
-    let grid = steps
-        .steps
-        .last()
-        .cloned()
-        .ok_or(SolveError::Unsolvable)?;
+    let grid = steps.steps.last().cloned().ok_or(SolveError::Unsolvable)?;
     Ok(SolvedPuzzle {
         color_panel: steps.color_panel,
         grid,
@@ -167,7 +163,10 @@ mod tests {
                 }
                 let len = col - start;
                 if color > 0 && len > 0 {
-                    groups.push(Group { len, color_id: color });
+                    groups.push(Group {
+                        len,
+                        color_id: color,
+                    });
                 }
             }
             row_groups.push(groups);
@@ -185,7 +184,10 @@ mod tests {
                 }
                 let len = row - start;
                 if color > 0 && len > 0 {
-                    groups.push(Group { len, color_id: color });
+                    groups.push(Group {
+                        len,
+                        color_id: color,
+                    });
                 }
             }
             col_groups.push(groups);
@@ -219,11 +221,7 @@ mod tests {
 
     #[test]
     fn solves_color_puzzle_matches_hints() {
-        let solved_ids = vec![
-            vec![1, 1, 1],
-            vec![2, 2, 2],
-            vec![1, 1, 1],
-        ];
+        let solved_ids = vec![vec![1, 1, 1], vec![2, 2, 2], vec![1, 1, 1]];
         let solved_masks = masks_from_color_ids(&solved_ids);
         let (row_groups, col_groups) = groups_from_grid(&solved_masks);
 
