@@ -29,6 +29,7 @@ body {
 }
 
 .card {
+  position: relative;
   background: var(--color-card);
   border: 1px solid var(--color-border-strong);
   border-radius: 12px;
@@ -40,6 +41,47 @@ body {
   font-size: 20px;
   font-weight: 600;
   margin: 0 0 12px;
+}
+
+.github-corner {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 64px;
+  height: 64px;
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.github-corner svg {
+  fill: #1f1f1f;
+  color: #ffffff;
+  width: 64px;
+  height: 64px;
+}
+
+.github-corner:hover .octo-arm {
+  animation: octo-wave 560ms ease-in-out;
+}
+
+.github-corner:focus-visible {
+  outline: 2px solid var(--color-dark);
+  outline-offset: 2px;
+}
+
+@keyframes octo-wave {
+  0%, 100% { transform: rotate(0); }
+  20%, 60% { transform: rotate(-25deg); }
+  40%, 80% { transform: rotate(10deg); }
+}
+
+.octo-arm {
+  transform-origin: 130px 106px;
+}
+
+.octo-arm,
+.octo-body {
+  fill: #ffffff;
 }
 
 .input-row {

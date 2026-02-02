@@ -2,6 +2,7 @@ use dioxus::prelude::*;
 
 mod components;
 
+use components::github_corner::GithubCorner;
 use components::puzzle_viewer::PuzzleViewer;
 use nonogram_solver::nonogram_solver::solve_puzzle_steps;
 use nonogram_solver::puzzle_crawler::{
@@ -48,6 +49,7 @@ fn App() -> Element {
 
         main { class: "page",
             div { class: "card",
+                GithubCorner { href: "https://github.com/willwang-io/NonogramSolver".to_string() }
                 h1 { class: "title", "Nonogram Solver" }
                 div { class: "input-row",
                     input {
