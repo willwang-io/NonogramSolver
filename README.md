@@ -2,7 +2,7 @@
 
 A Rust + Dioxus implementation of a colored Nonogram solver. The original version was written in Python with Processing and is preserved in the `archive/` folder.
 
-This project started as an Advanced Algorithms course project and case study. I chose this topic because I was addicted to these puzzles at the time. The approach is inspired by Batenburg and Kosters’ paper, *Solving Nonograms by Combining Relaxations[^1]*. The solver is not just a brute-force DP routine — it models the kind of incremental, constraint-based reasoning a human solver uses, but in a systematic and efficient way. Note that a black-and-white Nonogram is a special case of a colored Nonogram with only two colors.
+This project started as an Advanced Algorithms course project and case study back in my final year of university. I chose this topic because I was addicted to these puzzles at the time. The approach is inspired by Batenburg and Kosters’ paper, *Solving Nonograms by Combining Relaxations[^1]*. Each step is actually meant to mirror human-style Nonogram reasoning, applied systematically and efficiently. Here are some [techniques](https://www.nonograms.org/methods) if you want to get a feel for how it's actually done. Note that a black-and-white Nonogram is a special case of a colored Nonogram with only two colors.
 
 ## Features
 

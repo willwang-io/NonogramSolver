@@ -41,5 +41,9 @@ pub fn PuzzleViewer(steps: SolveSteps) -> Element {
             }
             div { class: "step-label", "Steps: {step_idx} / {max_step}" }
         }
+        div { class: "step-note",
+            "Each step reflects human-style reasoning. "
+            a { href: "https://www.nonograms.org/methods", target: "_blank", rel: "noopener noreferrer", "Learn more" }
+        }
     }
 }

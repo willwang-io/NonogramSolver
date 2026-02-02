@@ -158,6 +158,18 @@ body {
   color: #6a6a66;
 }
 
+.step-note {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #6a6a66;
+  text-align: center;
+}
+
+.step-note a {
+  color: #2f2f2a;
+  text-decoration: underline;
+}
+
 .step-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
