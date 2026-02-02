@@ -9,6 +9,8 @@ dioxus = { version = "0.7.1", features = ["fullstack"] }
 serde = { version = "1", features = ["derive"] }
 reqwest = "0.13.1"
 
+[dev-dependencies]
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 
 [features]
 default = ["web", "server"]

@@ -140,3 +140,106 @@ pub fn mask_to_color_index(mask: u64) -> Option<usize> {
         None
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::puzzle_crawler::Group;
+
+    fn masks_from_color_ids(grid: &[Vec<usize>]) -> Vec<Vec<u64>> {
+        grid.iter()
+            .map(|row| row.iter().map(|id| 1u64 << id).collect())
+            .collect()
+    }
+
+    fn groups_from_grid(grid: &[Vec<u64>]) -> (Vec<Vec<Group>>, Vec<Vec<Group>>) {
+        let rows = grid.len();
+        let cols = grid.first().map(|row| row.len()).unwrap_or(0);
+        let mut row_groups = Vec::with_capacity(rows);
+        for row in grid {
+            let mut groups = Vec::new();
+            let mut col = 0;
+            while col < cols {
+                let color = mask_to_color_index(row[col]).expect("unsolved cell");
+                let start = col;
+                while col < cols && mask_to_color_index(row[col]).unwrap() == color {
+                    col += 1;
+                }
+                let len = col - start;
+                if color > 0 && len > 0 {
+                    groups.push(Group { len, color_id: color });
+                }
+            }
+            row_groups.push(groups);
+        }
+
+        let mut col_groups = Vec::with_capacity(cols);
+        for col in 0..cols {
+            let mut groups = Vec::new();
+            let mut row = 0;
+            while row < rows {
+                let color = mask_to_color_index(grid[row][col]).expect("unsolved cell");
+                let start = row;
+                while row < rows && mask_to_color_index(grid[row][col]).unwrap() == color {
+                    row += 1;
+                }
+                let len = row - start;
+                if color > 0 && len > 0 {
+                    groups.push(Group { len, color_id: color });
+                }
+            }
+            col_groups.push(groups);
+        }
+        (row_groups, col_groups)
+    }
+
+    #[test]
+    fn solves_black_white_puzzle_matches_hints() {
+        let solved_ids = vec![
+            vec![0, 0, 1, 0, 0],
+            vec![0, 1, 1, 1, 0],
+            vec![1, 1, 1, 1, 1],
+            vec![0, 1, 1, 1, 0],
+            vec![0, 0, 1, 0, 0],
+        ];
+        let solved_masks = masks_from_color_ids(&solved_ids);
+        let (row_groups, col_groups) = groups_from_grid(&solved_masks);
+
+        let puzzle = PuzzleData {
+            color_panel: vec!["#ffffff".to_string(), "#000000".to_string()],
+            row_groups,
+            col_groups,
+        };
+
+        let solved = solve_puzzle(puzzle.clone()).expect("puzzle should solve");
+        let (row_out, col_out) = groups_from_grid(&solved.grid);
+        assert_eq!(row_out, puzzle.row_groups);
+        assert_eq!(col_out, puzzle.col_groups);
+    }
+
+    #[test]
+    fn solves_color_puzzle_matches_hints() {
+        let solved_ids = vec![
+            vec![1, 1, 1],
+            vec![2, 2, 2],
+            vec![1, 1, 1],
+        ];
+        let solved_masks = masks_from_color_ids(&solved_ids);
+        let (row_groups, col_groups) = groups_from_grid(&solved_masks);
+
+        let puzzle = PuzzleData {
+            color_panel: vec![
+                "#ffffff".to_string(),
+                "#ff0000".to_string(),
+                "#0000ff".to_string(),
+            ],
+            row_groups,
+            col_groups,
+        };
+
+        let solved = solve_puzzle(puzzle.clone()).expect("puzzle should solve");
+        let (row_out, col_out) = groups_from_grid(&solved.grid);
+        assert_eq!(row_out, puzzle.row_groups);
+        assert_eq!(col_out, puzzle.col_groups);
+    }
+}
