@@ -4,6 +4,7 @@ use nonogram_solver::nonogram_solver::mask_to_color_index;
 
 #[component]
 pub fn PuzzleGrid(color_panel: Vec<String>, grid: Vec<Vec<u64>>, is_initial: bool) -> Element {
+    let mut show_lines = use_signal(|| true);
     let rows = grid.len();
     let cols = grid.first().map(|row| row.len()).unwrap_or(0);
     let cell_size = cell_size_for_grid(rows, cols);
@@ -34,6 +35,11 @@ pub fn PuzzleGrid(color_panel: Vec<String>, grid: Vec<Vec<u64>>, is_initial: boo
         .iter()
         .map(|color| (format!("background-color: {};", color), color.to_string()))
         .collect();
+    let grid_class = if show_lines() {
+        "grid show-lines"
+    } else {
+        "grid"
+    };
 
     rsx! {
         div { class: "puzzle-meta",
@@ -45,9 +51,15 @@ pub fn PuzzleGrid(color_panel: Vec<String>, grid: Vec<Vec<u64>>, is_initial: boo
                         div { class: "swatch-color", style: style, title: color.clone(), "data-color": "{color}" }
                     }
                 }
+                button {
+                    class: "grid-toggle",
+                    r#type: "button",
+                    onclick: move |_| *show_lines.write() = !show_lines(),
+                    if show_lines() { "Hide grid" } else { "Show grid" }
+                }
             }
         }
-        div { class: "grid", style: grid_style,
+        div { class: grid_class, style: grid_style,
             for cell_style in cells {
                 div { class: "cell", style: cell_style }
             }
