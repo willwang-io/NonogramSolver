@@ -4,7 +4,9 @@ mod components;
 
 use components::puzzle_viewer::PuzzleViewer;
 use nonogram_solver::nonogram_solver::solve_puzzle_steps;
-use nonogram_solver::puzzle_crawler::{fetch_puzzle as fetch_remote_puzzle, PuzzleData, PuzzleKind};
+use nonogram_solver::puzzle_crawler::{
+    PuzzleData, PuzzleKind, fetch_puzzle as fetch_remote_puzzle,
+};
 
 const STYLE_CSS: Asset = asset!("/assets/style.css");
 
@@ -14,7 +16,7 @@ fn main() {
 
 #[component]
 fn App() -> Element {
-    let mut input_url = use_signal(String::new);
+    let mut input_url = use_signal(|| "56215".to_string());
 
     let puzzle = use_resource(move || {
         let url = input_url();
@@ -35,6 +37,12 @@ fn App() -> Element {
 
     rsx! {
         document::Stylesheet { href: STYLE_CSS }
+        document::Link { rel: "icon", href: asset!("/assets/favicon.ico") }
+        document::Meta {
+            name: "description",
+            content: "Solve color and black-and-white nonograms online with step-by-step visualization.",
+        }
+        document::Meta { name: "author", content: "Jiaye Will Wang" }
         div { class: "page",
             div { class: "card",
                 h1 { class: "title", "Nonogram Solver" }
@@ -47,7 +55,13 @@ fn App() -> Element {
                         oninput: move |e| *input_url.write() = e.value(),
                     }
                 }
-                div { class: "hint", "Example: https://www.nonograms.org/nonograms/i/1822 or https://www.nonograms.org/nonograms2/i/79575" }
+                div { class: "hint",
+                    "Paste a nonograms.org URL or enter an ID."
+                    br {}
+                    "Color: https://www.nonograms.org/nonograms2/i/56215"
+                    br {}
+                    "Black & white: https://www.nonograms.org/nonograms/i/1822 (or prefix with bw:)"
+                }
                 {match puzzle() {
                     None => rsx! { div { class: "status", "Loading puzzle..." } },
                     Some(Err(err)) => rsx! { div { class: "status", "Failed to load puzzle: {err}" } },
